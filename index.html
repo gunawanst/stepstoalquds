@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Leaderboard — Steps to Al Quds</title>
+<style>
+  :root{
+    /* ===== Brand palette ===== */
+    --brand-blue:#062640;     /* teks utama */
+    --brand-gold:#B78628;     /* aksen utama */
+    --brand-gold-dark:#8F6A1F;
+
+    /* ===== App surfaces ===== */
+    --sky-0:#f5f8fc; --sky-1:#eef3f8; --sky-2:#e6eff7;
+    --stroke:#d6e1eb;
+    --shadow:0 8px 24px rgba(6,38,64,.08);
+
+    --text:var(--brand-blue);
+    --muted:#020B13;
+
+    --chip:#f2f6fa; --chip-stroke:#dce6ef;
+
+    /* ===== Podium colors ===== */
+    --gold:var(--brand-gold); --gold-dark:var(--brand-gold-dark);
+    --silver:#cbd5e1; --silver-dark:#94a3b8;
+    --bronze:#B06B2C; --bronze-dark:#8A4F1A;
+
+    /* Desktop card width */
+    --pod-width:250px;        /* sesuaikan 280–320px sesuai selera */
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; color:var(--text);
+    background: radial-gradient(1200px 520px at 50% -12%, var(--sky-2) 0%, var(--sky-0) 55%);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif
+  }
+
+  /* ===== Layout shell ===== */
+  .wrap{width:100%; max-width:1200px; margin:12px auto; padding:0 12px}
+  .panel{width:100%; background:var(--sky-1); border:1px solid var(--stroke); border-radius:26px; overflow:hidden; box-shadow:var(--shadow)}
+
+  header{
+    display:flex; align-items:center; gap:10px; padding:14px 16px;
+    border-bottom:1px solid var(--stroke);
+    background:linear-gradient(180deg,var(--sky-0),var(--sky-1))
+  }
+  header img{height:28px}
+  header .kicker{font-size:10px; color:var(--muted); letter-spacing:.18em}
+  header h1{margin:2px 0 0; font-size:20px; letter-spacing:.02em; font-weight:900}
+
+  /* ===== SUMMARY BAR ===== */
+  .summary-wrap { padding:28px 14px; } /* tambah jarak ke header & podium */
+  .summary{
+    display:flex; justify-content:center; align-items:center; flex-wrap:wrap;
+    text-align:center; gap:.4ch; margin:0 auto;
+    max-width:640px; padding:10px 16px; border-radius:18px;
+    background:linear-gradient(180deg,#f8fafc,#eef3f8);
+    border:1px solid var(--chip-stroke); box-shadow:0 6px 16px rgba(6,38,64,.06);
+    color:var(--text); font-size:15px; line-height:1.35; font-weight:600;
+  }
+  .summary .num{ font-weight:900; color:var(--brand-gold); font-variant-numeric:tabular-nums; }
+  .summary .dot{ opacity:.5 }
+  .summary .lead{ color:var(--muted); font-weight:700; }
+
+  /* ===== PODIUM (2–1–3) ===== */
+  .podium{
+    display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
+    align-items:end; gap:18px; padding:20px 18px 8px; /* jarak dari summary-wrap sudah diperbesar */
+    text-align:center; margin-top:0;
+  }
+  .pod{ 
+    position:relative; padding:16px 12px 14px; border-radius:22px; overflow:visible;
+    border:1px solid var(--stroke); box-shadow:var(--shadow);
+    display:grid; grid-template-rows:auto auto auto 1fr auto; /* tinggi konsisten */
+    min-height:220px;
+  }
+  .pod[data-rank="1"]{ 
+    transform:translateY(-12px);
+    background:linear-gradient(0deg, rgba(183,134,40,.92) 0%, rgba(183,134,40,.48) 55%, rgba(183,134,40,0) 100%);
+    border-color:rgba(143,106,31,.6); box-shadow:0 8px 24px rgba(183,134,40,.32);
+  }
+  .pod[data-rank="2"]{
+    background:linear-gradient(0deg, rgba(203,213,225,.92) 0%, rgba(203,213,225,.48) 55%, rgba(203,213,225,0) 100%);
+    border-color:rgba(148,163,184,.6); box-shadow:0 8px 24px rgba(148,163,184,.28);
+  }
+  .pod[data-rank="3"]{
+    background:linear-gradient(0deg, rgba(176,107,44,.92) 0%, rgba(176,107,44,.48) 55%, rgba(176,107,44,0) 100%);
+    border-color:rgba(138,79,26,.6); box-shadow:0 8px 24px rgba(176,107,44,.3);
+  }
+
+  .medal{
+    position:absolute; top:-4px; left:50%; transform:translateX(-50%);
+    width:40px; height:40px; border-radius:999px; display:grid; place-items:center;
+    background-size:contain; background-position:center; background-repeat:no-repeat;
+  }
+  .crown{
+    position:absolute; top:-10px; left:50%; transform:translate(-50%,-55%);
+    width:56px; height:40px; z-index:3; pointer-events:none;
+    background:url("img/crown.svg") center/contain no-repeat;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.25));
+  }
+
+  /* Avatar */
+  .avatar{
+    display:flex; align-items:center; justify-content:center;
+    border-radius:50%; font-weight:900;
+    background:linear-gradient(180deg,#fdfdfd,#f2f2f2);
+    margin:16px auto 10px; text-align:center;
+  }
+  .pod[data-rank="1"] .avatar{
+    width:clamp(60px,20vw,90px); height:clamp(60px,20vw,90px); font-size:clamp(18px,5vw,30px);
+    border:4px solid var(--gold-dark); box-shadow:0 0 10px rgba(183,134,40,.45);
+  }
+  .pod[data-rank="2"] .avatar{
+    width:clamp(60px,20vw,80px); height:clamp(60px,20vw,80px); font-size:clamp(18px,5vw,28px);
+    border:3px solid var(--silver-dark); box-shadow:0 0 10px rgba(148,163,184,.4);
+  }
+  .pod[data-rank="3"] .avatar{
+    width:clamp(60px,20vw,80px); height:clamp(60px,20vw,80px); font-size:clamp(18px,5vw,28px);
+    border:3px solid var(--bronze-dark); box-shadow:0 0 10px rgba(176,107,44,.4);
+  }
+
+  .name{ font-weight:900; padding:0 8px; text-align:center; margin-inline:auto; width:100%; letter-spacing:.2px; }
+  .email{ color:var(--muted); font-size:12px; display:block; max-width:88%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:0 auto; }
+
+  .meta{ display:flex; gap:8px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+  .pill{ background:var(--chip); border:1px solid var(--chip-stroke); border-radius:999px; padding:6px 10px; font-weight:800; font-size:13px; font-variant-numeric:tabular-nums; }
+  .pill small{ color:var(--muted); font-weight:700; opacity:.7; }
+
+  .pod[data-rank="1"] .medal{ background-image:url("img/medal-1.svg"); }
+  .pod[data-rank="2"] .medal{ background-image:url("img/medal-2.svg"); }
+  .pod[data-rank="3"] .medal{ background-image:url("img/medal-3.svg"); }
+
+  /* ===== TABLE / LIST ===== */
+  .table{ padding:22px 16px 18px; margin-top:10px; display:flex; flex-direction:column; gap:10px; }
+  .thead{
+    display:grid; grid-template-columns:72px 1fr 180px; gap:10px; align-items:center;
+    color:#0b334e; font-weight:800; font-size:12px; padding:6px 14px;
+    position:sticky; top:0; z-index:5;
+    background:linear-gradient(180deg,#f8fafc,#eef3f8); border-radius:12px;
+  }
+  .thead div:last-child{ text-align:right }
+
+  .list{
+    display:flex; flex-direction:column; gap:10px;
+    overflow:auto; max-height:clamp(280px, 40vh, 420px); padding-right:6px; padding-top:4px;
+  }
+  .row{
+    display:grid; grid-template-columns:72px 1fr 180px; gap:10px; align-items:center;
+    background:linear-gradient(180deg,#f2f6fa,#e9f1f8);
+    border:1px solid var(--stroke); border-radius:18px; padding:12px 14px; box-shadow:var(--shadow);
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .row:hover{ transform:translateY(-1px); box-shadow:0 10px 28px rgba(6,38,64,.10); }
+  .rank{ padding-left:10px; justify-self:start; font-weight:900; color:var(--brand-blue); text-align:left; }
+  .who{ min-width:0; }
+  .who .n{ font-weight:700; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .who .m{ color:var(--muted); font-size:12px; line-height:1.2; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pts{ text-align:right; font-variant-numeric:tabular-nums; font-weight:900; color:var(--brand-blue); min-width:180px; }
+
+  .empty{ padding:14px; text-align:center; color:var(--muted) }
+  footer{ padding:12px 14px; border-top:1px solid var(--stroke); color:var(--muted); font-size:13px; text-align:center }
+
+  :focus-visible{ outline:2px solid var(--brand-gold); outline-offset:2px; }
+
+  /* ===== Desktop: kartu podium lebih ramping & terpusat ===== */
+  @media (min-width:900px){
+    .podium{
+      grid-template-columns: repeat(3, minmax(0, var(--pod-width)));
+      justify-content: center;
+      gap:22px;
+      padding-top:6px;
+    }
+    .pod{
+      width: var(--pod-width);
+      min-height:210px;
+      border-radius:20px;
+      padding:28px 16px 20px;
+    }
+    .pod[data-rank="1"] .avatar{ width:86px; height:86px; font-size:28px; }
+    .pod[data-rank="2"] .avatar,
+    .pod[data-rank="3"] .avatar{ width:76px; height:76px; font-size:26px; }
+
+    .thead div:last-child{ 
+      text-align:right;
+      padding-right:12px; /* atau gunakan margin-right:-6px */
+  }
+  }
+
+  /* ===== Mobile overrides ===== */
+  @media (max-width:600px){
+    .summary{ font-size:13px; line-height:1.3; padding:8px 12px; max-width:90%; border-radius:14px }
+    .podium{ padding:32px 10px 8px; gap:10px; }
+    .pod{ padding:14px 10px; }
+    .thead, .row{ grid-template-columns:50px 1fr 100px; }
+    .pts{ min-width:100px; }
+  }
+</style>
+
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <header>
+        <img src="img/stepstoalqudslogo.png" alt="Steps to Al Quds">
+        <div>
+          <div class="kicker">LEADERBOARD</div>
+          <h1>STEPS TO AL QUDS</h1>
+        </div>
+      </header>
+
+      <!-- SUMMARY BAR -->
+      <div class="summary-wrap">
+        <div id="summary" class="summary" aria-live="polite"></div>
+      </div>
+
+      <!-- podium -->
+      <section class="podium" id="podium" aria-live="polite"></section>
+
+      <!-- list / table -->
+      <section class="table">
+        <div class="thead">
+          <div>Rank</div><div>Peserta</div><div>Total Langkah</div>
+        </div>
+        <div id="list" class="list"></div>
+        <div id="empty" class="empty" hidden>Tidak ada data.</div>
+      </section>
+
+      <footer>dibuat dengan ❤️ oleh tim ISA</footer>
+    </div>
+  </div>
+
+<script>
+  const SHEET_ID   = '1PEeo_hkWVW_ibDkjEA34OgmD8NcNqJLxMbjaP52lLCA';
+  const SHEET_NAME = 'Rekap';
+
+  async function fetchSheet(){
+    const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    const res=await fetch(url,{cache:'no-store'}); const txt=await res.text();
+    const json=JSON.parse(txt.substring(txt.indexOf('{'),txt.lastIndexOf('}')+1));
+    const cols=json.table.cols.map(c=>(c&&c.label)?c.label.trim():'' );
+    const rows=(json.table.rows||[]).map(r=>(r.c||[]).map(c=>c?c.v:'' ));
+    return {cols,rows};
+  }
+
+  const norm=s=>String(s||'').toLowerCase().trim();
+  function findIndex(cols,names){
+    const lc=cols.map(norm);
+    for(const n of names){ const i=lc.indexOf(norm(n)); if(i!==-1) return i; }
+    for(const n of names){ const i=lc.findIndex(h=>h.includes(norm(n))); if(i!==-1) return i; }
+    return -1;
+  }
+  const fmt=n=>(Number(n)||0).toLocaleString('id-ID');
+
+  function initials(name,email){
+    const base=(name||'').trim()||(email||'').split('@')[0];
+    const parts=base.replace(/\s+/g,' ').split(' ');
+    const f=parts[0]?.charAt(0)||''; const l=parts.length>1?parts.at(-1).charAt(0):'';
+    return (f+l||f||'?').toUpperCase();
+  }
+  function firstName(full=''){
+    const n=String(full||'').trim(); if(!n) return '(Tanpa Nama)'; return n.split(/\s+/)[0];
+  }
+
+  function aggregateAllTime({cols,rows}){
+    const idxEmail   = findIndex(cols,['Email']);
+    const idxNama    = findIndex(cols,['Nama Lengkap','Nama']);
+    const idxSteps   = findIndex(cols,['Langkah','Steps','Total Langkah','Total']);
+    const map=new Map();
+    for(const r of rows){
+      const email=r[idxEmail]||''; if(!email) continue;
+      const nama=r[idxNama]||''; const steps=Number(r[idxSteps])||0;
+      if(!map.has(email)) map.set(email,{nama,email,total:0});
+      map.get(email).total+=steps;
+    }
+    return [...map.values()];
+  }
+
+  function renderSummary(data){
+    const el=document.getElementById('summary');
+    if(!data.length){ el.textContent=''; return; }
+
+    const totalPeserta=data.length;
+    const totalLangkah=data.reduce((acc,p)=>acc+(Number(p.total)||0),0);
+    const pesertaTxt=totalPeserta.toLocaleString('id-ID');
+    const langkahTxt=totalLangkah.toLocaleString('id-ID');
+
+    el.innerHTML=`
+      <span class="lead">Kita melangkah bersama:</span>
+      <span class="num">${pesertaTxt}</span> peserta
+      <span class="dot">•</span>
+      <span class="num">${langkahTxt}</span> langkah <span class="lead">terkumpul</span>
+    `;
+    el.setAttribute('aria-label', el.textContent);
+  }
+
+  function render(data){
+    const podium=document.getElementById('podium');
+    const list=document.getElementById('list');
+    const empty=document.getElementById('empty');
+    podium.innerHTML=''; list.innerHTML=''; empty.hidden=true;
+
+    if(!data.length){ empty.hidden=false; return; }
+    data.sort((a,b)=>(b.total||0)-(a.total||0));
+
+    // TOP 3 (2–1–3)
+    const top=data.slice(0,3);
+    const order=[1,0,2].filter(i=>i<top.length);
+    order.forEach(idx=>{
+      const p=top[idx]; const rank=idx+1;
+      const pod=document.createElement('div'); pod.className='pod'; pod.dataset.rank=String(rank);
+      const medal=document.createElement('div'); medal.className='medal'; pod.appendChild(medal);
+      if(rank===1){ const crown=document.createElement('div'); crown.className='crown'; pod.appendChild(crown); }
+      pod.innerHTML+=`
+        <div class="avatar">${initials(p.nama,p.email)}</div>
+        <div class="name" title="${p.nama||''}">${firstName(p.nama)}</div>
+        <span class="email" title="${p.email||''}">${p.email||''}</span>
+        <div class="meta"><div class="pill">${fmt(p.total)} <small>langkah</small></div></div>`;
+      podium.appendChild(pod);
+    });
+
+    // LIST rank >= 4
+    let rank=4;
+    data.slice(3).forEach(p=>{
+      const row=document.createElement('div'); row.className='row';
+      row.innerHTML=`
+        <div class="rank">${rank++}</div>
+        <div class="who">
+          <div class="n" title="${p.nama||''}">${p.nama||'(Tanpa Nama)'}</div>
+          <div class="m" title="${p.email||''}">${p.email||''}</div>
+        </div>
+        <div class="pts">${fmt(p.total)}</div>`;
+      list.appendChild(row);
+    });
+
+    renderSummary(data);
+  }
+
+  (async () => {
+    const sheet=await fetchSheet();
+    const data=aggregateAllTime(sheet);
+    render(data);
+  })();
+
+  // Aksesibilitas kecil
+  window.addEventListener('keydown', e=>{
+    if(e.key==='Tab') document.documentElement.classList.add('user-tabbing');
+  });
+</script>
+</body>
+</html>

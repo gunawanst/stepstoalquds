@@ -47,8 +47,19 @@
     background:linear-gradient(180deg,var(--sky-0),var(--sky-1))
   }
   header img{height:28px}
-  header .kicker{font-size:10px; color:var(--muted); letter-spacing:.18em}
-  header h1{margin:2px 0 0; font-size:20px; letter-spacing:.02em; font-weight:900}
+  header .kicker{
+    font-size:11px; 
+    color:var(--muted); 
+    letter-spacing:.14em;
+    text-transform:uppercase
+    }
+
+  header h1{
+    margin:2px 0 0; 
+    font-size:20px; 
+    letter-spacing:.02em; 
+    font-weight:900
+  }
 
   /* ===== SUMMARY BAR ===== */
   .summary-wrap { padding:28px 14px; } /* tambah jarak ke header & podium */
@@ -163,6 +174,16 @@
   .empty{ padding:14px; text-align:center; color:var(--muted) }
   footer{ padding:12px 14px; border-top:1px solid var(--stroke); color:var(--muted); font-size:13px; text-align:center }
 
+  footer a{
+    color: var(--brand-blue);
+    text-decoration: none;
+    font-weight: 700;
+    transition: color .2s ease;
+  }
+  footer a:hover{
+    color: var(--brand-gold);
+  }
+
   :focus-visible{ outline:2px solid var(--brand-gold); outline-offset:2px; }
 
   /* ===== Desktop: kartu podium lebih ramping & terpusat ===== */
@@ -206,8 +227,8 @@
       <header>
         <img src="img/stepstoalqudslogo.png" alt="Steps to Al Quds">
         <div>
-          <div class="kicker">LEADERBOARD</div>
-          <h1>STEPS TO AL QUDS</h1>
+        <div class="kicker">Steps to Al Quds</div>
+        <h1>Leaderboard</h1>
         </div>
       </header>
 
@@ -228,7 +249,9 @@
         <div id="empty" class="empty" hidden>Tidak ada data.</div>
       </section>
 
-      <footer>dibuat dengan ❤️ oleh tim ISA</footer>
+      <footer>
+        © 2025 <a href="https://www.institutalaqsha.com/" target="_blank" rel="noopener">ISA</a>. All rights reserved.
+      </footer>
     </div>
   </div>
 

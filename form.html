@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+
+<title>Formulir — Steps to Al Quds</title>
+<style>
+  /* ========== Tokens / Theme ========== */
+  :root{
+    /* Brand */
+    --brand-blue:#062640;
+    --brand-blue-2:#0b334e;
+    --brand-gold:#B78628;
+    --brand-gold-dark:#8F6A1F;
+
+    /* UI */
+    --stroke:#d6e1eb;
+    --text:#062640;
+    --muted:#475569;
+
+    /* Danger */
+    --danger:#b42318;
+    --danger-bg:#fee4e2;
+  }
+
+  /* ========== Base ========== */
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    color:var(--text);
+    background:#fff;
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  }
+  :focus-visible{ outline:2px solid var(--brand-gold); outline-offset:2px; }
+  .visually-hidden{
+    position:absolute!important; width:1px; height:1px; padding:0; margin:-1px;
+    overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+  }
+
+  /* ========== Shell ========== */
+  .wrap{ width:100%; max-width:720px; margin:16px auto; padding:0 12px; }
+  .panel{ width:100%; background:#fff; border:1px solid var(--stroke); border-radius:26px; overflow:hidden; }
+  main{ padding:22px 16px 18px; }
+
+  /* Header */
+  header{
+    display:flex; align-items:center; gap:12px;
+    padding:14px 16px;
+    border-bottom:1px solid var(--stroke);
+    background:linear-gradient(180deg,#fff,#f6f9fc);
+  }
+  header img{
+    height:52px; max-height:64px; width:auto; object-fit:contain;
+  }
+  header .brand-txt{ display:flex; flex-direction:column; justify-content:center; line-height:1; }
+  header .kicker{ margin:0 0 4px; font-size:12px; letter-spacing:.16em; color:#64748b; }
+  header h1{ margin:0; font-size:22px; font-weight:900; }
+
+  /* Responsive header */
+  @media (max-width:520px){
+    header img{ height:42px; }
+    main{ padding:18px 12px 16px; }
+  }
+
+  /* ========== Form ========== */
+  form{ display:grid; gap:16px; }
+  .field{
+    display:grid; gap:8px;
+    padding:14px; border-radius:16px;
+    border:1px solid #e5edf5;
+    background:linear-gradient(180deg,#fafafa,#f3f6fa);
+  }
+  .label{ font-weight:800; color:var(--brand-blue-2); font-size:13px; }
+  .label.required::after{ content:" *"; color:var(--danger); font-weight:700; }
+  .hint{ font-size:12px; color:#6b7280; }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="number"]{
+    width:100%;
+    padding:10px 12px;
+    font-size:15px;
+    background:#fff;
+    border:1px solid var(--stroke);
+    border-radius:12px;
+  }
+  input::placeholder{ color:#6b7280; opacity:.7; }
+  input:focus{
+    border-color:var(--brand-gold);
+    outline:2px solid transparent;
+    box-shadow:0 0 0 3px rgba(183,134,40,.18);
+  }
+
+  .err{
+    display:none;
+    padding:8px 10px; font-size:12px;
+    color:var(--danger);
+    background:var(--danger-bg);
+    border:1px solid #fda29b;
+    border-radius:10px;
+  }
+
+  .actions{ display:flex; gap:10px; justify-content:flex-end; padding-top:6px; }
+
+  .btn{
+    appearance:none; border:0; cursor:pointer;
+    display:inline-flex; align-items:center; gap:10px;
+    padding:12px 16px; font-size:14px; font-weight:800; border-radius:14px;
+  }
+  .btn-ghost{ background:transparent; color:var(--brand-blue); }
+  .btn-ghost:disabled{ opacity:.6; cursor:not-allowed; }
+  .btn-primary{ background:linear-gradient(180deg,#c89b45,#b78628); color:#fff; }
+  .btn-primary:disabled{ opacity:.75; cursor:not-allowed; }
+
+  /* Spinner kecil pada tombol */
+  .spinner{
+    display:none; width:16px; height:16px; border-radius:999px;
+    border:2px solid rgba(255,255,255,.6); border-top-color:#fff;
+    animation:spin .8s linear infinite;
+  }
+  .btn-loading .spinner{ display:inline-block; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .alert{
+    display:none; padding:12px 14px;
+    font-size:14px; font-weight:700;
+    border:1px solid transparent; border-radius:14px;
+  }
+  .alert.error{ color:var(--danger); background:var(--danger-bg); border-color:#fda29b; }
+
+  footer{
+    padding:12px 14px; border-top:1px solid var(--stroke);
+    color:#64748b; font-size:13px; text-align:center;
+  }
+  footer a{ color:var(--brand-blue); text-decoration:none; font-weight:700; }
+  footer a:hover{ color:var(--brand-gold); }
+
+  /* ========== Modal Full Page ========== */
+  .modal-backdrop{
+    position:fixed; inset:0; z-index:1000;
+    background:#fff; display:none; overflow:hidden;
+  }
+  .modal-backdrop.show{ display:block; }
+
+  .modal-page{
+    --padV:6vh;
+    position:absolute; inset:0; width:100vw; height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    padding:var(--padV) 16px;
+  }
+  @media (min-width:960px){
+    .modal-page{ --padV:8vh; padding:var(--padV) 24px; }
+  }
+
+  .modal-close{
+    position:absolute; top:14px; right:14px;
+    width:40px; height:40px; display:grid; place-items:center;
+    border:1px solid var(--stroke); border-radius:999px; background:#fff; cursor:pointer;
+  }
+
+  .success-wrap{
+    width:min(900px,94vw);
+    height:calc(100vh - (var(--padV) * 2));
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+
+  .illobox{
+    flex:1 1 auto; min-height:0; width:100%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .success-img{ width:100%; height:100%; object-fit:contain; border-radius:16px; }
+
+  .success-title{
+    margin:16px 0 8px;
+    font-size:clamp(20px,2.2vw,28px);
+    font-weight:900; color:var(--brand-blue);
+  }
+  .success-text{
+    margin:0 0 18px; max-width:560px;
+    font-size:15px; color:#334155; line-height:1.6;
+  }
+  .success-btn{
+    appearance:none; border:0; cursor:pointer;
+    padding:14px 22px; font-size:15px; font-weight:800;
+    border-radius:999px; background:var(--brand-gold); color:#fff;
+  }
+  .success-btn:hover{ background:var(--brand-gold-dark); }
+  .success-btn:active{ transform:translateY(0) scale(.99); }
+
+  /* ========== Top Loading Bar (submit) ========== */
+  .topbar{
+    position:fixed; top:0; left:0; right:0; height:3px; display:none; z-index:1100;
+    background:linear-gradient(90deg,#f2e3c3,#b78628,#f2e3c3);
+    background-size:200% 100%; animation:topbar 1.2s linear infinite;
+  }
+  .topbar.show{ display:block; }
+  @keyframes topbar{ 0%{ background-position:0 0; } 100%{ background-position:200% 0; } }
+
+  /* ========== Mobile tweaks: naikkan teks popup & center konten ========== */
+  @media (max-width:520px){
+    /* Pastikan semua isi popup benar-benar di tengah layar */
+    .success-wrap{
+      justify-content: center;   /* pusat vertikal */
+      align-items: center;       /* pusat horizontal */
+      height: 100%;              /* ambil tinggi penuh area modal */
+      text-align: center;
+    }
+
+    .illobox{
+      flex: 0 0 auto;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .success-img{
+      height: 34vh;
+      max-height: 220px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .success-title{
+      margin: 8px 0 6px;
+    }
+
+    .success-text{
+      margin: 0 0 12px;
+      line-height: 1.5;
+    }
+
+    .success-btn{
+      margin-top: 6px;
+    }
+  }
+
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <header>
+        <img src="img/stepstoalqudslogo.png" alt="Steps to Al Quds">
+        <div class="brand-txt">
+          <div class="kicker">Recap Form of</div>
+          <h1>STEPS TO AL QUDS</h1>
+        </div>
+      </header>
+
+  <main>
+    <div id="alertError" class="alert error" role="alert">Periksa kembali input Anda.</div>
+
+    <iframe name="gform_iframe" id="gform_iframe" class="visually-hidden" title="gform transport"></iframe>
+
+    <form
+      action="https://docs.google.com/forms/d/e/1FAIpQLSf4XD9hKCuGN2YeOMq9__xn71BQxunD8-0KPpAj3A3mjODkdQ/formResponse"
+      method="POST"
+      target="gform_iframe"
+      id="saqForm"
+      novalidate
+      aria-describedby="formHint"
+    >
+      <p id="formHint" class="visually-hidden">Semua kolom wajib diisi. Gunakan angka untuk pekan dan jumlah langkah.</p>
+
+      <div class="field">
+        <label class="label required" for="fld-nama">Nama Lengkap</label>
+        <div class="control">
+          <input id="fld-nama" type="text" name="entry.437584934" required placeholder="Nama lengkap Anda" autocomplete="name" />
+        </div>
+        <div class="err" id="err-nama">Nama tidak boleh kosong.</div>
+      </div>
+
+      <div class="field">
+        <label class="label required" for="fld-email">Email</label>
+        <div class="control">
+          <input id="fld-email" type="email" inputmode="email" name="entry.903442615" required placeholder="nama@contoh.com" autocomplete="email" />
+        </div>
+        <div class="err" id="err-email">Masukkan email yang valid.</div>
+      </div>
+
+      <div class="field">
+        <div class="label required">Pekan ke-</div>
+        <div class="hint">Contoh: 1</div>
+        <div class="control">
+          <input id="fld-pekan" type="number" inputmode="numeric" min="1" step="1" name="entry.1622383982" required placeholder="1" />
+        </div>
+        <div class="err" id="err-pekan">Isi  pekan dengan angka (≥ 1).</div>
+      </div>
+
+      <div class="field">
+        <div class="label required">Jumlah Langkah</div>
+        <div class="hint">Contoh: 30000</div>
+        <div class="control">
+          <input id="fld-langkah" type="number" inputmode="numeric" min="0" step="1" name="entry.372558774" required placeholder="30000" />
+        </div>
+        <div class="err" id="err-langkah">Isi dengan angka 1 atau lebih.</div>
+      </div>
+
+      <input type="hidden" name="fvv" value="1">
+      <input type="hidden" name="fbzx" value="21609180318802407">
+      <input type="hidden" name="pageHistory" value="0">
+
+      <div class="actions">
+        <button type="reset" class="btn btn-ghost" id="btnReset">Reset</button>
+        <button type="submit" class="btn btn-primary" id="btnSubmit">
+          <span class="spinner" aria-hidden="true"></span>
+          <span class="btn-text">Kirim</span>
+        </button>
+      </div>
+    </form>
+  </main>
+
+      <footer>
+        © 2025 <a href="https://www.institutalaqsha.com/" target="_blank" rel="noopener">ISA</a>. All rights reserved.
+      </footer>
+    </div>
+  </div>
+
+  <!-- Garis loading atas -->
+  <div class="topbar" id="topbar"></div>
+
+  <!-- ===== MODAL FULL PAGE ===== -->
+  <div id="successModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="md-title" aria-describedby="md-desc">
+    <div class="modal-page" tabindex="-1">
+      <button class="modal-close" id="modalClose" aria-label="Tutup popup">
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" stroke="#0f172a" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+
+      <div class="success-wrap">
+        <div class="illobox">
+          <img class="success-img" src="img/1step.png" alt="Ilustrasi langkah menuju keberhasilan">
+        </div>
+        <h2 id="md-title" class="success-title">Bārakallāhu fīk!</h2>
+        <p id="md-desc" class="success-text">Data langkah Anda telah diterima.<br>Terima kasih atas partisipasinya.</p>
+        <button class="success-btn" id="modalContinue">Alhamdulillah</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // ===== Helper =====
+  const $ = (sel, el=document) => el.querySelector(sel);
+
+  const form       = $('#saqForm');
+  const iframe     = $('#gform_iframe');
+  const alertError = $('#alertError');
+  const btnSubmit  = $('#btnSubmit');
+  const btnText    = btnSubmit.querySelector('.btn-text');
+  const spinnerEl  = btnSubmit.querySelector('.spinner');
+  const btnReset   = $('#btnReset');
+  const topbar     = $('#topbar');
+
+  const fldNama    = $('#fld-nama');
+  const fldEmail   = $('#fld-email');
+  const fldPekan   = $('#fld-pekan');
+  const fldLangkah = $('#fld-langkah');
+
+  const errNama    = $('#err-nama');
+  const errEmail   = $('#err-email');
+  const errPekan   = $('#err-pekan');
+  const errLangkah = $('#err-langkah');
+
+  // ===== Modal logic =====
+  const modalBackdrop = $('#successModal');
+  const modalPage     = modalBackdrop.querySelector('.modal-page');
+  const modalBtn      = $('#modalContinue');
+  const modalClose    = $('#modalClose');
+  let lastFocused;
+
+  function openModal(){
+    lastFocused = document.activeElement;
+    modalBackdrop.classList.add('show');
+    modalPage.setAttribute('tabindex','-1');
+    modalPage.focus();
+    document.addEventListener('keydown', onKeyDown);
+    document.body.style.overflow = 'hidden'; // kunci scroll halaman
+  }
+  function closeModalAndShowForm(){
+    modalBackdrop.classList.remove('show');
+    document.removeEventListener('keydown', onKeyDown);
+    document.body.style.overflow = '';       // kembalikan scroll
+    try{ form.reset(); }catch(e){}
+    if(lastFocused) lastFocused.focus();
+  }
+  function onKeyDown(e){
+    if(e.key === 'Escape') closeModalAndShowForm();
+    // Focus trap sederhana
+    if(e.key === 'Tab'){
+      const focusables = modalBackdrop.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+      const first = focusables[0], last = focusables[focusables.length-1];
+      if(e.shiftKey && document.activeElement === first){ last.focus(); e.preventDefault(); }
+      else if(!e.shiftKey && document.activeElement === last){ first.focus(); e.preventDefault(); }
+    }
+  }
+  // Dua tombol dengan fungsi sama
+  modalBtn.addEventListener('click', closeModalAndShowForm);
+  modalClose.addEventListener('click', closeModalAndShowForm);
+
+  // ===== Validasi ringan =====
+  function show(el){ el.style.display='block'; }
+  function hide(el){ el.style.display='none'; }
+
+  function validate(){
+    let ok = true;
+    [errNama,errEmail,errPekan,errLangkah].forEach(hide);
+    hide(alertError);
+
+    if(!fldNama.value.trim()){ show(errNama); ok=false; }
+
+    const emailVal = fldEmail.value.trim();
+    if(!emailVal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)){ show(errEmail); ok=false; }
+
+    // Pekan: harus integer >= 1
+    const pekanStr = fldPekan.value.trim();
+    const pekan = Number(pekanStr);
+    if(pekanStr === '' || !Number.isInteger(pekan) || pekan < 1){ show(errPekan); ok=false; }
+
+    // LANGKAH: FIX utama — cegah '' dianggap 0
+    const langkahStr = fldLangkah.value.trim();
+    if(langkahStr === ''){
+      show(errLangkah); ok=false;
+    }else{
+      const langkah = Number(langkahStr);
+      if(!Number.isInteger(langkah) || langkah < 0){ show(errLangkah); ok=false; }
+    }
+
+    return ok;
+  }
+
+  // ===== Loading UI =====
+  function setLoading(state){
+    if(state){
+      btnSubmit.disabled = true;
+      btnReset.disabled  = true;
+      btnSubmit.classList.add('btn-loading');
+      btnText.textContent = 'Mengirim…';
+      form.setAttribute('aria-busy','true');
+      topbar.classList.add('show');
+    }else{
+      btnSubmit.disabled = false;
+      btnReset.disabled  = false;
+      btnSubmit.classList.remove('btn-loading');
+      btnText.textContent = 'Kirim';
+      form.removeAttribute('aria-busy');
+      topbar.classList.remove('show');
+    }
+  }
+
+  // Sukses submit: Google Forms memuat HTML di dalam iframe -> onload
+  let awaitingResponse = false; // cegah onload awal iframe
+  iframe.addEventListener('load', () => {
+    if(!awaitingResponse) return; // abaikan onload yang bukan dari submit
+    awaitingResponse = false;
+
+    setLoading(false);
+    form.reset();
+    hide(alertError);
+    openModal();
+  });
+
+  form.addEventListener('submit', (e) => {
+    if(!validate()){
+      e.preventDefault();
+      show(alertError);
+      alertError.textContent = 'Periksa kembali input Anda.';
+      return;
+    }
+    // Aktifkan loading sampai iframe selesai memuat respons
+    awaitingResponse = true;
+    setLoading(true);
+  });
+
+  // UX kecil
+  [fldPekan, fldLangkah].forEach(inp=>{
+    inp.addEventListener('wheel', e => e.target.blur(), {passive:true});
+  });
+  fldLangkah.addEventListener('blur', () => {
+    const v = fldLangkah.value;
+    if(v !== '') fldLangkah.setAttribute('title', Number(v).toLocaleString('id-ID'));
+  });
+</script>
+</body>
+</html>

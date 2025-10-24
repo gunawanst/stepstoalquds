@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
+<!-- Favicon -->
+<link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="shortcut icon" href="/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+<link rel="manifest" href="/site.webmanifest" />
+
 <title>Leaderboard — Steps to Al Quds</title>
 <style>
   :root{
@@ -42,24 +50,26 @@
   .panel{width:100%; background:var(--sky-1); border:1px solid var(--stroke); border-radius:26px; overflow:hidden; box-shadow:var(--shadow)}
 
   header{
-    display:flex; align-items:center; gap:10px; padding:14px 16px;
-    border-bottom:1px solid var(--stroke);
-    background:linear-gradient(180deg,var(--sky-0),var(--sky-1))
-  }
-  header img{height:28px}
-  header .kicker{
-    font-size:11px; 
-    color:var(--muted); 
-    letter-spacing:.14em;
-    text-transform:uppercase
+    display:flex; 
+    align-items:center; 
+    gap:12px; 
+    padding:14px 16px; 
+    border-bottom:1px solid var(--stroke); 
+    background:linear-gradient(180deg,#fff,#f6f9fc)
     }
-
-  header h1{
-    margin:2px 0 0; 
-    font-size:20px; 
-    letter-spacing:.02em; 
-    font-weight:900
+    
+  header img{
+    height:52px;          /* naikkan sedikit di desktop */
+    max-height:64px;
+    width:auto; object-fit:contain;
   }
+  @media (max-width:520px){
+    header img{height:42px}  /* tetap enak di mobile */
+  }
+
+  header .brand-txt{display:flex; flex-direction:column; justify-content:center; line-height:1}
+  header .kicker{font-size:12px; letter-spacing:.16em; color:#64748b; margin:0 0 0}
+  header h1{margin:0; font-size:22px; font-weight:900}
 
   /* ===== SUMMARY BAR ===== */
   .summary-wrap { padding:28px 14px; } /* tambah jarak ke header & podium */
